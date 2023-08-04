@@ -1,149 +1,159 @@
-import pypokedex  # pokemon info
-import PIL.Image, PIL.ImageTk
-import tkinter as tk
-import urllib3  # for links
-from io import BytesIO  # to get pokemon links
-import random
+import time
+import numpy as np
+import sys
 
+# Delay printing
+
+def delay_print(s):
+    # print one character at a time
+    # https://stackoverflow.com/questions/9246076/how-to-print-one-character-at-a-time-on-one-line
+    for c in s:
+        sys.stdout.write(c)
+        sys.stdout.flush()
+        time.sleep(0.05)
+
+# Create the class
 class Pokemon:
-    def __init__(self, name):
+    def __init__(self, name, types, moves, EVs, health='==================='):
+        # save variables as attributes
         self.name = name
-        self.stats = 50
-        self.hp = 50
+        self.types = types
+        self.moves = moves
+        self.attack = EVs['ATTACK']
+        self.defense = EVs['DEFENSE']
+        self.health = health
+        self.bars = 20 # Amount of health bars
 
-def load_pokemon():
-    pokemon = pypokedex.get(name=text_id_name.get())
 
-    http = urllib3.PoolManager()
-    response = http.request('GET', pokemon.sprites.front.get('default'))
-    image = PIL.Image.open(BytesIO(response.data))
-    
-    image = image.resize((100, 100))
+    def fight(self, Pokemon2):
+        # Allow two pokemon to fight each other
 
-    img = PIL.ImageTk.PhotoImage(image)
-    pokemon_image.config(image=img)
-    pokemon_image.image = img
+        # Print fight information
+        print("-----POKEMONE BATTLE-----")
+        print(f"\n{self.name}")
+        print("TYPE/", self.types)
+        print("ATTACK/", self.attack)
+        print("DEFENSE/", self.defense)
+        print("LVL/", 3*(1+np.mean([self.attack,self.defense])))
+        print("\nVS")
+        print(f"\n{Pokemon2.name}")
+        print("TYPE/", Pokemon2.types)
+        print("ATTACK/", Pokemon2.attack)
+        print("DEFENSE/", Pokemon2.defense)
+        print("LVL/", 3*(1+np.mean([Pokemon2.attack,Pokemon2.defense])))
 
-    pokemon_information.config(text=f"{pokemon.dex} - {pokemon.name}")
-    pokemon_types.config(text=f"{', '.join(pokemon.types)}")
-    update_base_stats(my_pokemon)
-    pokemon_height.config(text=f"Height: {pokemon.height} inch")
-    pokemon_weight.config(text=f"Weight: {pokemon.weight} kg")
+        time.sleep(2)
 
-def update_base_stats(pokemon_obj):
-    base_stats_text = f"Base Stats: {pokemon_obj.base_stats}"
-    if pokemon_obj.stats > 50:
-        base_stats_text += f" (+{pokemon_obj.stats - 50})"
-    pokemon_base_stats.config(text=base_stats_text)
+        # Consider type advantages
+        version = ['Fire', 'Water', 'Grass']
+        for i,k in enumerate(version):
+            if self.types == k:
+                # Both are same type
+                if Pokemon2.types == k:
+                    string_1_attack = '\nIts not very effective...'
+                    string_2_attack = '\nIts not very effective...'
 
-def feed_pokemon():
-    if my_pokemon:
-        my_pokemon.stats += 10
-        my_pokemon.hp += 10
-        text_box.insert(tk.END, f"{my_pokemon.name} is fed and its stats and HP increased!\n")
-        update_base_stats(my_pokemon)
-    else:
-        text_box.insert(tk.END, "No Pokémon to feed!\n")
-    text_box.see(tk.END)
+                # Pokemon2 is STRONG
+                if Pokemon2.types == version[(i+1)%3]:
+                    Pokemon2.attack *= 2
+                    Pokemon2.defense *= 2
+                    self.attack /= 2
+                    self.defense /= 2
+                    string_1_attack = '\nIts not very effective...'
+                    string_2_attack = '\nIts super effective!'
 
-def delete_pokemon():
-    global my_pokemon
-    if my_pokemon:
-        text_box.insert(tk.END, f"You released {my_pokemon.name}. It's now free!\n")
-        my_pokemon = None
-    else:
-        text_box.insert(tk.END, "No Pokémon to release!\n")
-    text_box.see(tk.END)
+                # Pokemon2 is WEAK
+                if Pokemon2.types == version[(i+2)%3]:
+                    self.attack *= 2
+                    self.defense *= 2
+                    Pokemon2.attack /= 2
+                    Pokemon2.defense /= 2
+                    string_1_attack = '\nIts super effective!'
+                    string_2_attack = '\nIts not very effective...'
 
-def catch_pokemon():
-    global my_pokemon
-    if my_pokemon:
-        text_box.insert(tk.END, "You already have a Pokémon!\n")
-    else:
-        pokemon_names = ["Pikachu", "Charmander", "Squirtle", "Bulbasaur"]
-        chosen_name = random.choice(pokemon_names)
-        my_pokemon = Pokemon(chosen_name)
-        text_box.insert(tk.END, f"You caught a {my_pokemon.name}!\n")
-        text_box.insert(tk.END, f"Now you can feed, release, or catch more Pokémon.\n")
-        update_base_stats(my_pokemon)
-    text_box.see(tk.END)
 
-def display_stats():
-    if my_pokemon:
-        text_box.insert(tk.END, f"{my_pokemon.name}'s stats: {my_pokemon.stats}\n")
-    else:
-        text_box.insert(tk.END, "No Pokémon to display stats for!\n")
-    text_box.see(tk.END)
+        # Now for the actual fighting...
+        # Continue while pokemon still have health
+        while (self.bars > 0) and (Pokemon2.bars > 0):
+            # Print the health of each pokemon
+            print(f"\n{self.name}\t\tHLTH\t{self.health}")
+            print(f"{Pokemon2.name}\t\tHLTH\t{Pokemon2.health}\n")
 
-window = tk.Tk()
-window.geometry("1000x800")
-window.title("Pokemon Pokedex")
-window.config(padx=5, pady=5, bg="light blue")
+            print(f"Go {self.name}!")
+            for i, x in enumerate(self.moves):
+                print(f"{i+1}.", x)
+            index = int(input('Pick a move: '))
+            delay_print(f"\n{self.name} used {self.moves[index-1]}!")
+            time.sleep(1)
+            delay_print(string_1_attack)
 
-title_label = tk.Label(window, text="Pokemon Pokedex")
-title_label.config(font=("Cursive", 32), bg="light blue")
-title_label.pack(padx=5, pady=5)
+            # Determine damage
+            Pokemon2.bars -= self.attack
+            Pokemon2.health = ""
 
-pokemon_image = tk.Label(window)
-pokemon_image.config(bg="light blue")
-pokemon_image.pack(padx=5, pady=5)
+            # Add back bars plus defense boost
+            for j in range(int(Pokemon2.bars+.1*Pokemon2.defense)):
+                Pokemon2.health += "="
 
-pokemon_information = tk.Label(window)
-pokemon_information.config(font=("Segoe UI", 20), bg="light blue")
-pokemon_information.pack(padx=5, pady=5)
+            time.sleep(1)
+            print(f"\n{self.name}\t\tHLTH\t{self.health}")
+            print(f"{Pokemon2.name}\t\tHLTH\t{Pokemon2.health}\n")
+            time.sleep(.5)
 
-pokemon_types = tk.Label(window)
-pokemon_types.config(font=("Segoe UI", 20), bg="light blue")
-pokemon_types.pack(padx=5, pady=5)
+            # Check to see if Pokemon fainted
+            if Pokemon2.bars <= 0:
+                delay_print("\n..." + Pokemon2.name + ' fainted.')
+                break
 
-pokemon_base_stats = tk.Label(window)
-pokemon_base_stats.config(font=("Segoe UI", 20), bg="light blue")
-pokemon_base_stats.pack(padx=5, pady=5)
+            # Pokemon2s turn
 
-pokemon_height = tk.Label(window)
-pokemon_height.config(font=("Segoe UI", 20), bg="light blue")
-pokemon_height.pack(padx=5, pady=5)
+            print(f"Go {Pokemon2.name}!")
+            for i, x in enumerate(Pokemon2.moves):
+                print(f"{i+1}.", x)
+            index = int(input('Pick a move: '))
+            delay_print(f"\n{Pokemon2.name} used {Pokemon2.moves[index-1]}!")
+            time.sleep(1)
+            delay_print(string_2_attack)
 
-pokemon_weight = tk.Label(window)
-pokemon_weight.config(font=("Segoe UI", 20), bg="light blue")
-pokemon_weight.pack(padx=5, pady=5)
+            # Determine damage
+            self.bars -= Pokemon2.attack
+            self.health = ""
 
-text_id_name = tk.Entry(window, font=("Segoe UI", 20), width=30)
-text_id_name.pack(padx=5, pady=5)
+            # Add back bars plus defense boost
+            for j in range(int(self.bars+.1*self.defense)):
+                self.health += "="
 
-btn_load = tk.Button(window, text="Load Pokemon", command=load_pokemon)
-btn_load.config(font=("Segoe UI", 20), bg="light blue", border=5)
-btn_load.pack(padx=5, pady=5)
-btn_load.config(height=0, width=15) 
+            time.sleep(1)
+            print(f"{self.name}\t\tHLTH\t{self.health}")
+            print(f"{Pokemon2.name}\t\tHLTH\t{Pokemon2.health}\n")
+            time.sleep(.5)
 
-btn_feed = tk.Button(window, text="Feed Pokemon", command=feed_pokemon)
-btn_feed.config(font=("Segoe UI", 20), bg="light blue", border=5)
-btn_feed.pack(padx=5, pady=5)
-btn_feed.config(height=0, width=15) 
+            # Check to see if Pokemon fainted
+            if self.bars <= 0:
+                delay_print("\n..." + self.name + ' fainted.')
+                break
 
-btn_delete = tk.Button(window, text="Delete Pokemon", command=delete_pokemon)
-btn_delete.config(font=("Segoe UI", 20), bg="light blue", border=5)
-btn_delete.pack(padx=5, pady=5)
-btn_delete.config(height=0, width=15) 
+        money = np.random.choice(5000)
+        delay_print(f"\nOpponent paid you ${money}.\n")
 
-btn_catch = tk.Button(window, text="Catch Pokemon", command=catch_pokemon)
-btn_catch.config(font=("Segoe UI", 20), bg="light blue", border=5)
-btn_catch.pack(padx=5, pady=5)
-btn_catch.config(height=0, width=15)
 
-scrollbar = tk.Scrollbar(window)
-scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
-text_box = tk.Text(window, height=3, width=30, yscrollcommand=scrollbar.set)
-text_box.config(font=("Segoe UI", 14))
-text_box.pack(padx=5, pady=5)
-text_box.insert(tk.END, "Welcome to the Pokemon Mini Game!\n")
-text_box.insert(tk.END, "Press '1' to catch a Pokémon.\n")
-text_box.insert(tk.END, "Press '2' to feed your Pokémon.\n")
-text_box.insert(tk.END, "Press '3' to release your Pokémon.\n")
 
-my_pokemon = None  # Placeholder for the caught Pokémon
 
-scrollbar.config(command=text_box.yview)
 
-window.mainloop()
+if __name__ == '__main__':
+    #Create Pokemon
+    Charizard = Pokemon('Charizard', 'Fire', ['Flamethrower', 'Fly', 'Blast Burn', 'Fire Punch'], {'ATTACK':12, 'DEFENSE': 8})
+    Blastoise = Pokemon('Blastoise', 'Water', ['Water Gun', 'Bubblebeam', 'Hydro Pump', 'Surf'],{'ATTACK': 10, 'DEFENSE':10})
+    Venusaur = Pokemon('Venusaur', 'Grass', ['Vine Wip', 'Razor Leaf', 'Earthquake', 'Frenzy Plant'],{'ATTACK':8, 'DEFENSE':12})
+
+    Charmander = Pokemon('Charmander', 'Fire', ['Ember', 'Scratch', 'Tackle', 'Fire Punch'],{'ATTACK':4, 'DEFENSE':2})
+    Squirtle = Pokemon('Squirtle', 'Water', ['Bubblebeam', 'Tackle', 'Headbutt', 'Surf'],{'ATTACK': 3, 'DEFENSE':3})
+    Bulbasaur = Pokemon('Bulbasaur', 'Grass', ['Vine Wip', 'Razor Leaf', 'Tackle', 'Leech Seed'],{'ATTACK':2, 'DEFENSE':4})
+
+    Charmeleon = Pokemon('Charmeleon', 'Fire', ['Ember', 'Scratch', 'Flamethrower', 'Fire Punch'],{'ATTACK':6, 'DEFENSE':5})
+    Wartortle = Pokemon('Wartortle', 'Water', ['Bubblebeam', 'Water Gun', 'Headbutt', 'Surf'],{'ATTACK': 5, 'DEFENSE':5})
+    Ivysaur = Pokemon('Ivysaur\t', 'Grass', ['Vine Wip', 'Razor Leaf', 'Bullet Seed', 'Leech Seed'],{'ATTACK':4, 'DEFENSE':6})
+
+
+    Charizard.fight(Blastoise) # Get them to fight
