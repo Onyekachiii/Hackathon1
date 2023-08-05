@@ -9,7 +9,7 @@ connection = psycopg2.connect(host=HOSTNAME, user=USERNAME, password=PASSWORD, d
 
 cursor = connection.cursor()
 
-cursor.execute("SELECT * FROM players LIMIT 40;")
+cursor.execute("SELECT * FROM players LIMIT 30;")
 
 results = cursor.fetchall()
 

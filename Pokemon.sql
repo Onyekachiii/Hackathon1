@@ -36,8 +36,6 @@
 --     player_id INTEGER REFERENCES players(player_id),
 --     pokemon_id INTEGER REFERENCES pokemons(pokemon_id)
 
-
 -- );
-
 --     CONNECTION LIMIT = -1
 --     IS_TEMPLATE = False;
