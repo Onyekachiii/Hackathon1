@@ -2,19 +2,19 @@
   "Charmander": {
     "name": "Charmander",
     "types": "Fire",
-    "moves": ["Ember", "Scratch", "Tackle", "Fire Punch"],
+    "moves": ["Scratch", "Tackle"],
     "EVs": { "ATTACK": 4, "DEFENSE": 2 }
   },
   "Squirtle": {
     "name": "Squirtle",
     "types": "Water",
-    "moves": ["Bubblebeam", "Tackle", "Headbutt", "Surf"],
+    "moves": ["Tackle", "Headbutt"],
     "EVs": { "ATTACK": 3, "DEFENSE": 3 }
   },
   "Bulbasaur": {
     "name": "Bulbasaur",
     "types": "Grass",
-    "moves": ["Vine Whip", "Razor Leaf", "Tackle", "Leech Seed"],
+    "moves": ["Tackle", "Leech Seed"],
     "EVs": { "ATTACK": 2, "DEFENSE": 4 }
   }
 }
