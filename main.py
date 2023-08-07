@@ -3,6 +3,8 @@ import numpy as np
 import sys
 import json # load json file
 import random #for random randint
+import psycopg2
+
 
 # Delay printing
 def delay_print(s):
@@ -59,9 +61,9 @@ class Pokemon:
     def introduce_game_with_storyline(self,Pokemon2,Player1,Player2):
         self.print_colorful_ascii_art("\nWelcome to Pokémon Arcade DEMO!", 'green')
         delay_print("\nYou are embarking on a journey to save the legendary Pokémon Arconia.")
-        delay_print("Legend has it that Arconia possesses immense power to \nprotect the Pokémon world.")
+        delay_print("Legend has it that Arconia possesses immense power to protect the Pokémon world.")
         delay_print("But it is under threat from the evil Team Darkstorm.")
-        delay_print("You must gather the strongest Pokémon and \ndefeat Team Darkstorm to save Arconia.")
+        delay_print("You must gather the strongest Pokémon and defeat Team Darkstorm to save Arconia.")
         delay_print("\nYour adventure begins...\n")
         delay_print("\nProfessor Juniper:Ah you've made it..")
         #boy or girl
@@ -396,7 +398,6 @@ class Pokemon:
 
 
 
-
 if __name__ == '__main__':
     with open('pokemon_data.json', 'r') as f:
         pokemon_data = json.load(f)
@@ -405,6 +406,31 @@ if __name__ == '__main__':
     Charmander = Pokemon(**pokemon_data["Charmander"])
     Squirtle = Pokemon(**pokemon_data["Squirtle"])
     Bulbasaur = Pokemon(**pokemon_data["Bulbasaur"])
+    
+    try:
+        db_name = {
+            "hostname" : 'localhost',
+            "username" : 'postgres',
+            "password" : 'Splendour01%',
+            "database" : 'Pokemon'   
+    
+        }
+    # Establish PostgreSQL connection
+        conn = psycopg2.connect(**db_name)
+        cursor = conn.cursor()
+
+        # Add your PostgreSQL code here
+        cursor.execute("SELECT * FROM players LIMIT 30;")
+        results = cursor.fetchall()
+        print(results)
+
+        # Commit changes and close the connection
+        conn.commit()
+        cursor.close()
+        conn.close()
+    
+    except psycopg2.Error as e:
+        print("Error:", e)
     
     Squirtle.introduce_game_with_storyline(Bulbasaur,'Ash','May')
     Squirtle.frist_fight(Bulbasaur,'Ash','May')

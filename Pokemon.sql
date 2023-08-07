@@ -19,7 +19,6 @@ CREATE TABLE players (
 CREATE TABLE battles (
     battle_id SERIAL PRIMARY KEY,
     player1_id INTEGER REFERENCES players(player_id),
-    player2_id INTEGER REFERENCES players(player_id),
     winner_id INTEGER REFERENCES players(player_id),
     battle_date DATE DEFAULT CURRENT_DATE
 );
