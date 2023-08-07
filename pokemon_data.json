@@ -3,18 +3,27 @@
     "name": "Charmander",
     "types": "Fire",
     "moves": ["Scratch", "Tackle"],
-    "EVs": { "ATTACK": 4, "DEFENSE": 2 }
+    "EVs": { "ATTACK": 4, "DEFENSE": 2 },
+    "description" : "It has a preference for hot things. When it rains, steam is said to spout from the tip of its tail. ",
+    "height": "2'00",
+    "weight": "18.7 lbs"
   },
   "Squirtle": {
     "name": "Squirtle",
     "types": "Water",
     "moves": ["Tackle", "Headbutt"],
-    "EVs": { "ATTACK": 3, "DEFENSE": 3 }
+    "EVs": { "ATTACK": 3, "DEFENSE": 3 },
+    "description" : "When it retracts its long neck into its shell, it squirts out water with vigorous force.",
+    "height": "1'08",
+    "weight": "19.8 lbs"
   },
   "Bulbasaur": {
     "name": "Bulbasaur",
     "types": "Grass",
     "moves": ["Tackle", "Leech Seed"],
-    "EVs": { "ATTACK": 2, "DEFENSE": 4 }
+    "EVs": { "ATTACK": 2, "DEFENSE": 4 },
+    "description" : "There is a plant seed on its back right from the day this Pokémon is born. The seed slowly grows larger. ",
+    "height": "2'04",
+    "weight": "15.2 lbs"
   }
 }
