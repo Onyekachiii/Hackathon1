@@ -11,6 +11,26 @@ def delay_print(s):
         sys.stdout.flush()
         time.sleep(0.05)
 
+class Item:
+    def __init__(self, name, description, effect):
+        self.name = name
+        self.description = description
+        self.effect = effect
+
+    def use(self, pokemon):
+        self.effect(pokemon)
+
+def heal_20(pokemon):
+    pokemon.heal(20)
+
+def heal_50(pokemon):
+    pokemon.heal(50)
+
+potion = Item("Potion", "Restores 20 health points.", heal_20)
+super_potion = Item("Super Potion", "Restores 50 health points.", heal_50)
+
+
+
 class Pokemon:
     def __init__(self, name, types, moves, EVs, health='===================='):
         self.name = name
@@ -20,6 +40,7 @@ class Pokemon:
         self.defense = EVs['DEFENSE']
         self.health = health
         self.bars = 20  # Amount of health bars
+        self.inventory = []
     
     def print_colorful_ascii_art(self, art, color='white'):
         colors = {
@@ -156,11 +177,38 @@ class Pokemon:
         delay_print(f"\nProfessor Jutiper:If you two are done choosing, come pick your pokedex and you can start adventuring into the vast world of Hoe-nn")
         delay_print(f"\n*You go to Professor Juniper and leaves the lab*\n")
         delay_print(f"\n*As you are leaving, you hear {Player2} shout your name*\n")
-        
+    
+    def use_item(self, item):
+        item.effect(self)
+
+    def heal(self, amount):
+        self.health = '=' * (len(self.health) + amount)
+        if len(self.health) > 20:
+            self.health = '=' * 20
+    
+    def add_item(self, item):
+        self.inventory.append(item)
+
+    def show_inventory(self):
+        delay_print("\nInventory:")
+        for i, item in enumerate(self.inventory):
+            delay_print(f"{i + 1}. {item.name}: {item.description}")
+
+    def choose_item(self):
+        try:
+            item_choice = int(input("\nEnter the number of the item you want to use: ")) - 1
+            selected_item = self.inventory[item_choice]
+            return selected_item
+        except (IndexError, ValueError):
+            return None
+    
+    
+    
+    
     def frist_fight(self, Pokemon2, Player1, Player2):
-        delay_print(f"{Player1}, I challenge you to a pokemon battle\n")
+        delay_print(f"{Player2}:{Player1}, I challenge you to a pokemon battle\n")
         delay_print("\n~~~~POKEMON BATTLE~~~~~\n")
-        delay_print(f"\n{self.name}")
+        delay_print(f"\n{self.new_name}")
         delay_print(f"\nTYPE/{self.types}")
         delay_print(f"\nATTACK/{self.attack}")
         delay_print(f"\nDEFENSE/{self.defense}\n")
@@ -195,6 +243,8 @@ class Pokemon:
         }
         delay_print(f"\n{Player1}: Go {self.name}, I choose you!\n")
         delay_print(f"\n{Player2}: Go {Pokemon2.name}, I choose you!\n")
+        active_pokemon = self
+        available_pokemon = [self]
         while self.bars > 0 and Pokemon2.bars > 0:
             money = np.random.choice(100)
             delay_print(f"\n{self.name}: \n")
@@ -206,26 +256,57 @@ class Pokemon:
             #
             player1_type = self.types
             player2_type = Pokemon2.types
-            delay_print(f"\n{Player1}: {self.name}, Use: ")
-            try:
-                for i, move in enumerate(self.moves):
-                    delay_print(f"\n{i + 1}. {move}  ")
-                move_choice = int(input("\nEnter the number of the move you want to use: ")) - 1
-                selected_move = self.moves[move_choice]
-                delay_print(f"{self.name} used {selected_move}")
-            except (IndexError, ValueError):
-                delay_print("Invalid input. Please pick a valid move.Since you are someone who doesnt understand basic english we skipped your turn and  selected a random move. :)")
-            # Determine effectiveness for Player 2
-            try:
-                if player1_type in type_advantages:
-                    if player2_type in type_advantages[player1_type]:
-                        delay_print("\nSuper effective!")
-                        Pokemon2.health = Pokemon2.health[:-10]  # Reduce health by 10 characters
+            while True:
+                delay_print(f"\nWhat are you going to do:'1.Fight','2.Use item','3.Switch pokemon','4.Run'")
+                decision = input("\nEnter: ")
+                if decision == '1':
+                    delay_print(f"\n{Player1}: {self.name}, Use: ")
+                    try:
+                        for i, move in enumerate(self.moves):
+                            delay_print(f"\n{i + 1}. {move}  ")
+                        move_choice = int(input("\nEnter the number of the move you want to use: ")) - 1
+                        selected_move = self.moves[move_choice]
+                        delay_print(f"{self.name} used {selected_move}")
+                    except (IndexError, ValueError):
+                        delay_print("Invalid input. Please pick a valid move.Since you are someone who doesnt understand basic english we skipped your turn and  selected a random move. :)")
+                    # Determine effectiveness for Player 2
+                    try:
+                        if player1_type in type_advantages:
+                            if player2_type in type_advantages[player1_type]:
+                                delay_print("\nSuper effective!")
+                                Pokemon2.health = Pokemon2.health[:-10]  # Reduce health by 10 characters
+                            else:
+                                delay_print("\nNot very effective.")
+                                Pokemon2.health = Pokemon2.health[:-5]
+                    except (IndexError, ValueError):
+                        delay_print("Invalid input. Please pick a valid move.Since you are someone who doesnt understand basic english we skipped your turn and  selected a random move. :)")
+                    break
+                elif decision == '4':
+                    delay_print("Pokemon trainers battle.Unable to run")
+                elif decision == '3':
+                    if len(available_pokemon) == 1:
+                        delay_print("You only have one Pokémon!")
                     else:
-                        delay_print("\nNot very effective.")
-                        Pokemon2.health = Pokemon2.health[:-5]
-            except (IndexError, ValueError):
-                delay_print("Invalid input. Please pick a valid move.Since you are someone who doesnt understand basic english we skipped your turn and  selected a random move. :)")
+                        delay_print("\nChoose a Pokémon to switch to:")
+                        for i, pokemon in enumerate(available_pokemon):
+                            delay_print(f"{i + 1}. {pokemon.name}")
+                        try:
+                            switch_choice = int(input("\nEnter the number of the Pokémon you want to switch to: ")) - 1
+                            active_pokemon = available_pokemon[switch_choice]
+                            delay_print(f"{Player1} switched to {active_pokemon.name}!")
+                        except (IndexError, ValueError):
+                            delay_print("Invalid input. Please pick a valid Pokémon.")
+                elif decision == "2":
+                    if len(self.inventory) == 0:
+                        delay_print("You don't have any items in your inventory.")
+                    else:
+                        self.show_inventory()
+                        selected_item = self.choose_item()
+                        if selected_item:
+                            self.use_item(selected_item)
+                            delay_print(f"\n{self.name} used {selected_item.name}!")
+                        else:
+                            delay_print("Invalid. Try again")
             
             if len(Pokemon2.health) == 0:
                 delay_print(f"\n{Pokemon2.name} fainted. {Player1} wins!\n")
@@ -243,23 +324,20 @@ class Pokemon:
             #
             #
             #
-            delay_print(f"\n{Player2}: {Pokemon2.name}, Use: ")
-            for i, move in enumerate(Pokemon2.moves):
-                delay_print(f"\n{i + 1}. {move}  ")
-            # Generate a random move choice
-            move_choice = random.randint(1, len(Pokemon2.moves)) - 1
-            selected_move = Pokemon2.moves[move_choice]
-            # Display the selected move
-            delay_print(f"\n{Player2}: {Pokemon2.name} used {selected_move}")
-            # Determine effectiveness for Player 2
-            if player2_type in type_advantages:
-                if player1_type in type_advantages[player2_type]:
+            # AI Opponent's turn
+            ai_move_choice = random.randint(0, len(Pokemon2.moves) - 1)
+            ai_selected_move = Pokemon2.moves[ai_move_choice]
+            delay_print(f"\n{Player2}: {Pokemon2.name} used {ai_selected_move}")
+
+            # Determine effectiveness for AI Opponent's move
+            if player1_type in type_advantages:
+                if player2_type in type_advantages[player1_type]:
                     delay_print("\nSuper effective!")
                     self.health = self.health[:-10]  # Reduce health by 10 characters
                 else:
                     delay_print("\nNot very effective.")
                     self.health = self.health[:-5]  # Reduce health by 5 characters
-            
+
             if len(self.health) == 0:
                 delay_print(f"\n{self.name} fainted. {Player2} wins!\n")
                 delay_print(f"\n{Player1} paid {Player2} ${money}.\n")
@@ -268,9 +346,8 @@ class Pokemon:
     
     
     
-    
     def after_first_battle(self,Player1,Player2,):
-        delay_print(f"\n{Player2}:pff...I knew you were weak..pathetic")
+        delay_print(f"\n{Player2}:pff...whatever")
         delay_print(f"\n{Player2}:I'm out")
         delay_print(f"\n*{Player2} leaves*\n")
         delay_print(f"\n{Player1}:I should get stronger")
@@ -281,7 +358,39 @@ class Pokemon:
                 break
             else:
                 delay_print("\nInvalid try again.")
-        delay_print("More in full version....")
+        while True:
+            delay_print("\nWhat do you want to do:'1.Run around in bushes','2.follow the path to gym','3.Open old map','4.Open pokedex','5.Go to the nearest Pokemon Center','6.Go to the nearest PokeMart','7.Exit' ")
+            action = input("\nEnter here: ")
+            if action == '1':
+                delay_print('\nGet full version..')
+            elif action == "2":
+                delay_print('\nGet full version..')
+            elif action == "3":
+                delay_print('\nGet full version..')
+            elif action == "4":
+                while True:
+                    delay_print("\nWhat would you like to do with your Pokédex? ('1.View Pokédex', '2.Exit')")
+                    pokedex_action = input("\nEnter your choice: ")
+
+                    if pokedex_action == '1':
+                        delay_print("\nViewing Pokédex...\n")
+                        delay_print("\n=== Pokédex ===\n")
+                        for pokemon_name, data in pokemon_data.items():
+                            print(f"\n{pokemon_name}: Type: {data['types']},\n Attack: {data['EVs']['ATTACK']}, \nDefense: {data['EVs']['DEFENSE']}")
+                        print("\n================")
+                    elif pokedex_action == '2':
+                        break  # Exit the Pokédex menu
+                    else:
+                        delay_print("\nInvalid option. Please try again.")
+            elif action == "5":
+                delay_print('\nGet full version..')
+            elif action == "6":
+                delay_print('\nGet full version..')
+            elif action == "7":
+                delay_print('\nGoodBye..')
+                break
+            else:
+                delay_print("\nInvalid.Try")
 
 
 
@@ -293,50 +402,9 @@ if __name__ == '__main__':
         pokemon_data = json.load(f)
 
 
-    Charizard = Pokemon(**pokemon_data["Charizard"])
-    Blastoise = Pokemon(**pokemon_data["Blastoise"])
-    Venusaur = Pokemon(**pokemon_data["Venusaur"])
     Charmander = Pokemon(**pokemon_data["Charmander"])
     Squirtle = Pokemon(**pokemon_data["Squirtle"])
     Bulbasaur = Pokemon(**pokemon_data["Bulbasaur"])
-    Charmeleon = Pokemon(**pokemon_data["Charmeleon"])
-    Wartortle = Pokemon(**pokemon_data["Wartortle"])
-    Ivysaur = Pokemon(**pokemon_data["Ivysaur"])
-    Pikachu = Pokemon(**pokemon_data["Pikachu"])
-    Jigglypuff = Pokemon(**pokemon_data["Jigglypuff"])
-    Geodude = Pokemon(**pokemon_data["Geodude"])
-    Machop = Pokemon(**pokemon_data["Machop"])
-    Gastly = Pokemon(**pokemon_data["Gastly"])
-    Abra = Pokemon(**pokemon_data["Abra"])
-    Growlithe = Pokemon(**pokemon_data["Growlithe"])
-    Slowpoke = Pokemon(**pokemon_data["Slowpoke"])
-    Magnemite = Pokemon(**pokemon_data["Magnemite"])
-    Doduo = Pokemon(**pokemon_data["Doduo"])
-    Seel = Pokemon(**pokemon_data["Seel"])
-    Grimer = Pokemon(**pokemon_data["Grimer"])
-    Onix = Pokemon(**pokemon_data["Onix"])
-    Caterpie = Pokemon(**pokemon_data["Caterpie"])
-    Weedle = Pokemon(**pokemon_data["Weedle"])
-    Pidgey = Pokemon(**pokemon_data["Pidgey"])
-    Rattata = Pokemon(**pokemon_data["Rattata"])
-    Spearow = Pokemon(**pokemon_data["Spearow"])
-    Ekans = Pokemon(**pokemon_data["Ekans"])
-    Sandshrew = Pokemon(**pokemon_data["Sandshrew"])
-    NidoranF = Pokemon(**pokemon_data["Nidoranf"])
-    NidoranM = Pokemon(**pokemon_data["Nidoranm"])
-    Clefairy = Pokemon(**pokemon_data["Clefairy"])
-    Vulpix = Pokemon(**pokemon_data["Vulpix"])
-    Zubat = Pokemon(**pokemon_data["Zubat"])
-    Oddish = Pokemon(**pokemon_data["Oddish"])
-    Paras = Pokemon(**pokemon_data["Paras"])
-    Venonat = Pokemon(**pokemon_data["Venonat"])
-    Diglett = Pokemon(**pokemon_data["Diglett"])
-    Meowth = Pokemon(**pokemon_data["Meowth"])
-    Psyduck = Pokemon(**pokemon_data["Psyduck"])
-    Mankey = Pokemon(**pokemon_data["Mankey"])
-    Poliwag = Pokemon(**pokemon_data["Poliwag"])
-    Bellsprout = Pokemon(**pokemon_data["Bellsprout"])
-    Tentacool = Pokemon(**pokemon_data["Tentacool"])
     
     Squirtle.introduce_game_with_storyline(Bulbasaur,'Ash','May')
     Squirtle.frist_fight(Bulbasaur,'Ash','May')
