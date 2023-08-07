@@ -117,6 +117,10 @@ class Pokemon:
                 go_inside = input("\nEnter 'e' to enter: \n")
         delay_print(f"\nProfessor Juniper:Welcome {Player1},We were just waiting for you.")
         delay_print(f"\nProfessor Juniper:Meet my daughter... ... ...")
+        
+        
+        
+        
         #rival name
         Player2 = input("\nEnter your Rival's name(default:'May'): ") or "May"
         while True:
@@ -135,6 +139,12 @@ class Pokemon:
         delay_print(f"\nProfessor Juniper:Don't worry {Player1}, she is an angel even if she doesn't show it")
         delay_print(f"\nProfessor Juniper:Today,you two are going to start your journey today so go over the table and grab a pokemon")
         delay_print(f"\n*You move to the table and choose a pokemon*\n")
+        
+        
+        
+        
+        
+        
         #choose pokemon
         self.name = input(f'\nYou choose a pokemon, options are (Charmander[fire-type]),(Bulbasaur[Grass-type]),(Squirtle[Water-Type]): ')
         while True:
@@ -149,19 +159,26 @@ class Pokemon:
         
         
         #nickname
-        delay_print(f"\nDo you wish to give {self.name} a nickname?")
-        give_nickname = input(f"\nYes or No?: ")
+        while True:
+            give_nickname = input(f"\nDo you wish to give {self.name} a nickname? (Yes/No): ")
 
-        if give_nickname.lower() == 'yes':
-            while True:
-                self.new_name = input(f"\nWhat nickname do you want to give your {self.name}?: ")
-                delay_print(f"\nAre you sure you want {self.name} to be nicknamed as {self.new_name}?")
-                confirm_nickname = input("\nYes or No?: ")
-                if confirm_nickname.lower() == 'yes':
-                    delay_print(f"\n{self.name} is now named {self.new_name}")
-                    break
-        else:
-            self.new_name = self.name
+            if give_nickname.lower() == 'yes':
+                while True:
+                    self.new_name = input(f"\nWhat nickname do you want to give your {self.name}?: ")
+                    confirm_nickname = input(f"\nAre you sure you want {self.name} to be nicknamed as {self.new_name}? (Yes/No): ")
+
+                    if confirm_nickname.lower() == 'yes':
+                        delay_print(f"\n{self.name} is now named {self.new_name}")
+                        break
+                    else:
+                        # Ask for the nickname again
+                        continue
+                # Exit the outer loop as the nickname confirmation process is complete
+                break
+            else:
+                self.new_name = self.name
+                break
+
 
 
 
@@ -361,34 +378,27 @@ class Pokemon:
             else:
                 delay_print("\nInvalid try again.")
         while True:
-            delay_print("\nWhat do you want to do:'1.Run around in bushes','2.follow the path to gym','3.Open old map','4.Open pokedex','5.Go to the nearest Pokemon Center','6.Go to the nearest PokeMart','7.Exit' ")
+            delay_print("\nWhat do you want to do:\n1.Run around in bushes\n2.follow the path to gym\n3.Open old map\n4.Open pokedex\n5.Go to the nearest Pokemon Center\n6.Go to the nearest PokeMart\n7.Save\n8.Exit ")
             action = input("\nEnter here: ")
-            if action == '1':
-                delay_print('\nGet full version..')
-            elif action == "2":
-                delay_print('\nGet full version..')
-            elif action == "3":
+            if action == '1' or action == '2' or action == '3' or action == '5' or action == '6' or action == '7':
                 delay_print('\nGet full version..')
             elif action == "4":
                 while True:
-                    delay_print("\nWhat would you like to do with your Pokédex? ('1.View Pokédex', '2.Exit')")
+                    delay_print("\nWhat would you like to do with your Pokédex?\n1.View Pokédex\n2.Exit")
                     pokedex_action = input("\nEnter your choice: ")
 
                     if pokedex_action == '1':
                         delay_print("\nViewing Pokédex...\n")
                         delay_print("\n=== Pokédex ===\n")
                         for pokemon_name, data in pokemon_data.items():
-                            print(f"\n{pokemon_name}: Type: {data['types']},\n Attack: {data['EVs']['ATTACK']}, \nDefense: {data['EVs']['DEFENSE']}")
-                        print("\n================")
+                            delay_print(f"\n{pokemon_name}:\nType: {data['types']}\nAttack: {data['EVs']['ATTACK']}\nDefense: {data['EVs']['DEFENSE']}\n")
+                            delay_print("\n-----------------\n")
+                        delay_print("\n================\n")
                     elif pokedex_action == '2':
                         break  # Exit the Pokédex menu
                     else:
                         delay_print("\nInvalid option. Please try again.")
-            elif action == "5":
-                delay_print('\nGet full version..')
-            elif action == "6":
-                delay_print('\nGet full version..')
-            elif action == "7":
+            elif action == "8":
                 delay_print('\nGoodBye..')
                 break
             else:
@@ -432,6 +442,6 @@ if __name__ == '__main__':
     except psycopg2.Error as e:
         print("Error:", e)
     
-    Squirtle.introduce_game_with_storyline(Bulbasaur,'Ash','May')
-    Squirtle.frist_fight(Bulbasaur,'Ash','May')
-    Squirtle.after_first_battle('Ash','May')
+    Charmander.introduce_game_with_storyline(Squirtle,'Ash','May')
+    Charmander.frist_fight(Squirtle,'Ash','May')
+    Charmander.after_first_battle('Ash','May')
