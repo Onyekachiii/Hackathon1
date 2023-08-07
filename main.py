@@ -445,6 +445,6 @@ if __name__ == '__main__':
     except psycopg2.Error as e:
         print("Error:", e)
     
-    # Charmander.introduce_game_with_storyline(Squirtle,'Ash','May')
-    # Charmander.frist_fight(Squirtle,'Ash','May')
+    Charmander.introduce_game_with_storyline(Squirtle,'Ash','May')
+    Charmander.frist_fight(Squirtle,'Ash','May')
     Charmander.after_first_battle('Ash','May')
