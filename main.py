@@ -34,15 +34,18 @@ super_potion = Item("Super Potion", "Restores 50 health points.", heal_50)
 
 
 class Pokemon:
-    def __init__(self, name, types, moves, EVs, health='===================='):
+    def __init__(self, name, types, moves, EVs, description, health='====================', height='', weight=''):
         self.name = name
-        self.types = types  # Make sure this is a single string, not a list
+        self.types = types
         self.moves = moves
         self.attack = EVs['ATTACK']
         self.defense = EVs['DEFENSE']
         self.health = health
-        self.bars = 20  # Amount of health bars
+        self.bars = 20
         self.inventory = []
+        self.description = description
+        self.height = height
+        self.weight = weight
     
     def print_colorful_ascii_art(self, art, color='white'):
         colors = {
@@ -391,7 +394,7 @@ class Pokemon:
                         delay_print("\nViewing Pokédex...\n")
                         delay_print("\n=== Pokédex ===\n")
                         for pokemon_name, data in pokemon_data.items():
-                            delay_print(f"\n{pokemon_name}:\nType: {data['types']}\nAttack: {data['EVs']['ATTACK']}\nDefense: {data['EVs']['DEFENSE']}\n")
+                            delay_print(f"\n{pokemon_name}:\nType: {data['types']}\nAttack: {data['EVs']['ATTACK']}\nDefense: {data['EVs']['DEFENSE']}\nDescription: {data['description']}\nHeight: {data['height']}\nWeight: {data['weight']}\n")
                             delay_print("\n-----------------\n")
                         delay_print("\n================\n")
                     elif pokedex_action == '2':
@@ -442,6 +445,6 @@ if __name__ == '__main__':
     except psycopg2.Error as e:
         print("Error:", e)
     
-    Charmander.introduce_game_with_storyline(Squirtle,'Ash','May')
-    Charmander.frist_fight(Squirtle,'Ash','May')
+    # Charmander.introduce_game_with_storyline(Squirtle,'Ash','May')
+    # Charmander.frist_fight(Squirtle,'Ash','May')
     Charmander.after_first_battle('Ash','May')
